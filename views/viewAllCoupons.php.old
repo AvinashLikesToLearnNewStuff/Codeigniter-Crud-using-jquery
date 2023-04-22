@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cookies</title>
+    <link rel="stylesheet" type="text/css" href="<?php echo base_url() . 'assets/css/bootstrap.min.css' ?>">
+    <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>  -->
+    <script type="text/javascript" src="<?php echo base_url(); ?>assets/js/jquery-3.6.4.min.js"></script>
+    <script type="text/javascript" src="<?php echo base_url(); ?>assets/js/bootstrap.min.js"></script>
+
+</head>
+
+<body>
+    <div class="header">
+        <div class="container">
+            <h1 class="heading">Coupon List View </h1>
+        </div>
+    </div>
+    <div class="container pt-2">
+        <div class="row">
+            <div class="col-md-6 pt-2">
+                <h4>coupons</h4>
+            </div>
+            <div class="col-md-6 text-right"><a href="javascript:void(0);" onclick='showModal();' class="btn btn-primary">Create</a></div>
+        </div>
+        <div class="col-md-12">
+            <table class="table table-striped" id="couponModelList">
+                <tr>
+                    <th>Id</th>
+                    <th>Code</th>
+                    <th>Discount</th>
+                    <th>Validity-start</th>
+                    <th>Validity-end</th>
+                    <th>Edit</th>
+                    <th>Delete</th>
+                </tr>
+                <?php if (!empty($rows)) { ?>
+                    <?php foreach ($rows as $row) { ?>
+                        <tr>
+                            <td>
+                                <?php echo $row['id'] ?>
+                            </td>
+                            <td>
+                                <?php echo $row['code'] ?>
+                            </td>
+                            <td>
+                                <?php echo $row['discount'] ?>
+                            </td>
+                            <td>
+                                <?php echo $row['validity_start'] ?>
+                            </td>
+                            <td>
+                                <?php echo $row['validity_end'] ?>
+                            </td>
+                            <td>
+                                <a a href="javascript:void(0);" class="btn btn-primary" onclick="showEditForm(<?php echo $row['id'] ?>)">edit</a>
+
+                            </td>
+                            <td>
+                                <button class="btn btn-danger"> delete </button>
+                            </td>
+                        </tr>
+                    <?php } ?>
+                <?php } else { ?>
+                    <tr>
+                        <td>records not found</td>
+                    </tr>
+                <?php } ?>
+            </table>
+        </div>
+    </div>
+
+
+    <!-- Modal -->
+    <div class="modal fade" id="createCoupon" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Create</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+
+                <div id="response"></div>
+
+
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Modal -->
+    <div class="modal fade" id="ajaxResponseModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">alert</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+
+
+                <div class="modal-body">
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">close</button>
+                    </div>
+                </div>
+
+
+
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        function showModal() {
+            $("#createCoupon").modal("show");
+
+            $.ajax({
+                url: '<?php echo base_url() . 'index.php/CouponRouter/showCreateForm' ?>',
+                type: 'POST',
+                data: {},
+                dataType: 'json',
+                success: function(response) {
+
+                    $("#response").html(response["html"]);
+                }
+            })
+            $("body").on("submit", "#createACouponForm", function(e) {
+                e.preventDefault();
+                var formData = $(this).serializeArray(); // Store the form data in a variable
+                $.ajax({
+                    url: '<?php echo base_url() . 'index.php/CouponRouter/saveCoupon' ?>',
+                    type: 'POST',
+                    data: formData, // Use the formData variable instead of $(this).serializeArray()
+                    dataType: 'json',
+                    success: function(response) {
+                        if (response['status'] == 0) {
+                            if (response["code"] != "") {
+                                $(".nameError").html(response["code"]);
+
+                            } else {
+
+                            }
+                        } else {
+                            $("#createCoupon").modal("hide");
+                            $("#ajaxResponseModal .modal-body").html(response['message']);
+                            $("#ajaxResponseModal").modal("show");
+
+                            $("#couponModelList").append(response['row']);
+
+                        }
+                    }
+                });
+            });
+
+
+        }
+
+        function showEditForm(id) {
+            $.ajax({
+                url: '<?php echo base_url() . "index.php/CouponRouter/getCouponId/" ?>' + id,
+                type: 'Post',
+                dataType: 'json',
+                success: function(response) {
+                    $("#createCoupon #response").html(response['html']);
+                    $("#createCoupon").modal('show');
+                }
+            });
+            // console.log("hi");
+            // alert(id);
+        }
+
+
+        $("body").on("submit", "#editACouponForm", function(e) {
+            e.preventDefault();
+            var formData = $(this).serializeArray(); // Store the form data in a variable
+            $.ajax({
+                url: '<?php echo base_url() . 'index.php/CouponRouter/updateModel' ?>',
+                type: 'POST',
+                data: formData, // Use the formData variable instead of $(this).serializeArray()
+                dataType: 'json',
+                success: function(response) {
+                    if (response['status'] == 0) {
+
+                    } else {
+                        $("#createCoupon").modal("hide");
+                        $("#ajaxResponseModal .modal-body").html(response['message']);
+                        $("#ajaxResponseModal").modal("show");
+
+                        $("#couponModelList").append(response['row']);
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

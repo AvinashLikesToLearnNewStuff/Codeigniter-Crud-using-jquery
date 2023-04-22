@@ -1,0 +1,23 @@
+    <tr>
+        <td>
+            <?php echo $row['id'] ?>
+        </td>
+        <td>
+            <?php echo $row['code'] ?>
+        </td>
+        <td>
+            <?php echo $row['discount'] ?>
+        </td>
+        <td>
+            <?php echo $row['validity_start'] ?>
+        </td>
+        <td>
+            <?php echo $row['validity_end'] ?>
+        </td>
+        <td>
+            <a href="javascript:void(0);" onclick="showEditForm( <?php echo $row['id'] ?>);" class="btn btn-primary">edit</a>
+        </td>
+        <td>
+            <button class="btn btn-danger"> delete </button>
+        </td>
+    </tr>

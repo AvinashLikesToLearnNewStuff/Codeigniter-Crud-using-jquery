@@ -1,0 +1,26 @@
+<?php
+class couponModel extends CI_Model
+{
+    public function create($formArray)
+    {
+        $this->db->insert('coupons', $formArray);
+        return $id = $this->db->insert_id();
+    }
+    public function all()
+    {
+        $result = $this->db->order_by('id', 'ASC')->get('coupons')->result_array();
+        return $result;
+    }
+    function getRow($id)
+    {
+        $this->db->where('id', $id);
+        $row = $this->db->get('coupons')->row_array();
+        return $row;
+    }
+    function update($id, $formArray)
+    {
+        $this->db->where('id', $id);
+        $this->db->update('coupons', $formArray);
+        return $id;
+    }
+}

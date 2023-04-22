@@ -1,0 +1,8 @@
+<?php
+
+class Course_model extends CI_model
+{
+    function insert_course_into_database()
+    {
+    }
+}
